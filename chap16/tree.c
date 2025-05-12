@@ -12,31 +12,28 @@ Node * makeNode(int);
 void addNodeRec(Node *, Node *);
 void preOrder(Node * root);
 void deleteNode(Node ** root, int data);
+void deleteAllNodesPostOrder(Node **);
 
 int main(void){
     Node * root = NULL;
+    addNode(&root, makeNode(40));
+    addNode(&root, makeNode(30));
+    addNode(&root, makeNode(150));
+    addNode(&root, makeNode(160));
+    addNode(&root, makeNode(110));
+    preOrder(root);
+
+    printf("after deleteing all nodes :\n");
+    deleteAllNodesPostOrder(&root);
+    preOrder(root);
+
+    printf("now add a bunch of nodes to rebuild the tree:\n");
     addNode(&root, makeNode(60));
-    addNode(&root, makeNode(120));
-    printf("address root points to %p\n", root);
-    printf("address left points to %p\n", root->left);
-    printf("address right points to %p\n", root->right);
-    printf("address of root %p\n", &root);
-    root = root->right;
-    printf("address root points to %p\n", root);
-    printf("address left points to %p\n", root->left);
-    printf("address right points to %p\n", root->right);
-    printf("address of root %p\n", &root);
-    printf("address of right %p\n", &root->right);
-    printf("address of left %p\n", &root->left);
-
-    // addNode(&root, makeNode(190));
-    // addNode(&root, makeNode(100));
-
-    // preOrder(root);
-
-    // printf("--------------after deleting 190--------------\n");
-    // deleteNode(&root, 190);
-    // preOrder(root);
+    addNode(&root, makeNode(250));
+    addNode(&root, makeNode(170));
+    addNode(&root, makeNode(45));
+    addNode(&root, makeNode(59));
+    preOrder(root);
     return 0;
 }
 
@@ -81,6 +78,8 @@ void addNodeRec(Node * root, Node * newNode){
 
 void deleteNode(Node ** root, int data){
     Node * tmp;
+    Node * minRight;
+    int tmpMinRightData;
     if ((*root)->data > data){
         deleteNode(&(*root)->left, data);
     }
@@ -90,16 +89,33 @@ void deleteNode(Node ** root, int data){
     else{
 
         // case 1: root right subtree is not null but left is null
+        // point parent of root to right
         if ((*root)->left == NULL){
             tmp = (*root);
             (*root) = (*root)->right;
             free(tmp);
         }
 
+        // case 2: root right subtree is null but left is not null.
+        // point parent of root to left
         else if ((*root)->right == NULL){
             tmp = (*root);
             (*root) = (*root)->left;
             free(tmp);
+        }
+
+        // case 3: node you want to delete has both left and right subtrees
+        // 
+        else{
+            minRight = (*root)->right;
+            while (minRight != NULL && minRight->left != NULL){
+                minRight = minRight->left;
+            }
+            tmpMinRightData = minRight->data;
+            minRight->data = (*root)->data;
+            (*root)->data = tmpMinRightData;
+            deleteNode(&(*root)->right, minRight->data);
+
         }
     }
 }
@@ -111,4 +127,15 @@ void preOrder(Node * root){
     printf("%d\n",root->data);
     preOrder(root->left);
     preOrder(root->right);
+}
+
+void deleteAllNodesPostOrder(Node ** root){
+    if ((*root) == NULL){
+        return;
+    }
+
+    // traverse 
+    deleteAllNodesPostOrder(&(*root)->left);
+    deleteAllNodesPostOrder(&(*root)->right);
+    deleteNode(root,(*root)->data);
 }

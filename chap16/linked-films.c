@@ -60,10 +60,6 @@ void printList(Film * head){
     }
 }
 
-Film * findFilm(char[]){
-    return NULL;
-}
-
 void free_linked_movies(Film ** head){
     Film * tmp = *(head);
     while (tmp != NULL){
